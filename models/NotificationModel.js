@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-var notificationSchema = new mongoose.Schema({
+var adminNotificationSchema = new mongoose.Schema({
     content:{
         type:String,
         required:true 
@@ -18,4 +18,27 @@ var notificationSchema = new mongoose.Schema({
     timestamps:true,
 })
 
-module.exports =  mongoose.model('Notification', notificationSchema);
+
+var clientNotificationSchema = new mongoose.Schema({
+    content:{
+        type:String,
+        required:true 
+    },
+    isSeen:{
+        type:Boolean,
+        required:true,
+        default:false
+    },
+    link:{
+        type:String,
+    },
+},
+{
+    timestamps:true,
+})
+
+
+const AdminNotification = mongoose.model('AdminNotification', adminNotificationSchema);
+const ClientNotification = mongoose.model('ClientNotification', clientNotificationSchema);
+
+module.exports =  {AdminNotification, ClientNotification};

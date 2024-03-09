@@ -6,6 +6,8 @@ const deleteImage = require('../services/DeleteImage')
 
 // models
 const Code = require('../models/CodeModel');
+const {AdminNotification} = require('../models/NotificationModel');
+
 
 // CREATE A CODE
 const createCode = asyncHandler(async(req, res)=>{
@@ -21,10 +23,25 @@ const createCode = asyncHandler(async(req, res)=>{
 
         const codes = req.body.codes;
         const testCodes = req.body.testCodes;
-        console.log(codes);
+        
         // create the new user
         const newCode = await Code.create({...req.body, image, codes:codes, testCodes:testCodes});
-        console.log(newCode);
+        
+        if(newCode.codes.length <= 3 &&  newCode.codes.length > 0){
+            await AdminNotification.create({
+                isSeen:false, 
+                content:`The product (${newCode.title}) is almost out of stock, there is ${newCode.codes.length} codes available.`, 
+                link:`/codes/${newCode._id}/edit`
+            })
+        }
+        else if(newCode.codes.length === 0){
+            await AdminNotification.create({
+                isSeen:false, 
+                content:`The product (${newCode.title}) is out of stock, there is no code available.`, 
+                link:`/codes/${newCode._id}/edit`
+            })
+        }
+
         return res.status(200).json({message:"code created successfully", newCode}) 
     } catch (error) {
         return res.status(500).json({message:"intrenal server error", error})
@@ -161,6 +178,21 @@ const updateCode = asyncHandler(async(req, res)=>{
         codeToUpdate.image= image;
         // update link
         await codeToUpdate.save();
+
+        if(codeToUpdate.codes.length <= 3 &&  codeToUpdate.codes.length > 0){
+            await AdminNotification.create({
+                isSeen:false, 
+                content:`The product (${codeToUpdate.title}) is almost out of stock, there is ${codeToUpdate.codes.length} codes available.`, 
+                link:`/codes/${codeToUpdate._id}/edit`
+            })
+        }
+        else if(codeToUpdate.codes.length === 0){
+            await AdminNotification.create({
+                isSeen:false, 
+                content:`The product (${codeToUpdate.title}) is out of stock, there is no code available.`, 
+                link:`/codes/${codeToUpdate._id}/edit`
+            })
+        }
 
         return res.status(200).json({message:"Updated Successfully"})
 

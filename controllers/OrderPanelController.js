@@ -4,6 +4,7 @@
   const User = require('../models/UserModel');
   const Panel = require('../models/PanelModel');
   const {OrderPanelModel} = require('../models/OrderModel');
+const { AdminNotification } = require('../models/NotificationModel');
   
   
   // Create an order
@@ -63,6 +64,12 @@ const createOrder = asyncHandler(async (req, res) => {
         product.volume += price;
         product.orders.push(newOrder._id)
         await product.save();
+
+        await AdminNotification.create({
+            isSeen:false, 
+            content:`New panel order (${product.title}) by ${user.userName} at ${price} Dhs`, 
+            link:`/orders/panels/${newOrder._id}`
+        })
 
         return res.status(200).json({message:'order created successfully', order:newOrder});
     } catch (error) {

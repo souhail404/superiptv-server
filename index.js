@@ -16,6 +16,7 @@ const OrderPanelRouter = require('./routes/OrderPanelRoute');
 const SoldHistoryRouter = require('./routes/SoldHistoryRoute');
 const ShopRouter = require('./routes/ShopRoute');
 const LinkRouter = require('./routes/LinkRoute');
+const AdminNotificationsRouter = require('./routes/AdminNotificationsRoute');
 
 // start the app
 const app = express(); 
@@ -59,3 +60,4 @@ app.use('/api/order-code/', OrderCodeRouter);
 app.use('/api/order-panel/', OrderPanelRouter);
 app.use('/api/sold-history/', SoldHistoryRouter);
 app.use('/api/general/', ShopRouter);
+app.use('/api/admin-notification/', AdminNotificationsRouter);

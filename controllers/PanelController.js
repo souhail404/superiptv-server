@@ -21,6 +21,7 @@ const createPanel = asyncHandler(async(req, res)=>{
 
         // create the new panel
         const newPanel = await Panel.create({...req.body, image});
+        
 
         return res.status(200).json({message:"Panel created successfully", newPanel}) 
     } catch (error) {

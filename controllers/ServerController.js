@@ -6,6 +6,8 @@ const deleteImage = require('../services/DeleteImage')
 
 // models
 const Server = require('../models/ServerModel');
+const {AdminNotification} = require('../models/NotificationModel');
+
 
 // CREATE A Server
 const createServer = asyncHandler(async(req, res)=>{ 
@@ -23,7 +25,22 @@ const createServer = asyncHandler(async(req, res)=>{
 
         // create the new user
         const newServer = await Server.create({...req.body, image, codes});
-        console.log(newServer);
+
+        if(newServer.codes.length <= 3 &&  newServer.codes.length > 0){
+            await AdminNotification.create({
+                isSeen:false, 
+                content:`The product (${newServer.title}) is almost out of stock, there is ${newServer.codes.length} codes available.`, 
+                link:`/servers/${newServer._id}/edit`
+            })
+        }
+        else if(newServer.codes.length === 0){
+            await AdminNotification.create({
+                isSeen:false, 
+                content:`The product (${newServer.title}) is out of stock, there is no code available.`, 
+                link:`/servers/${newServer._id}/edit`
+            })
+        }
+
         return res.status(200).json({message:"Server created successfully", newServer}) 
     } catch (error) {
         return res.status(500).json({message:"intrenal server error", error})
@@ -158,6 +175,21 @@ const updateServer = asyncHandler(async(req, res)=>{
         serverToUpdate.image= image;
         // update link
         await serverToUpdate.save();
+
+        if(serverToUpdate.codes.length <= 3 &&  serverToUpdate.codes.length > 0){
+            await AdminNotification.create({
+                isSeen:false, 
+                content:`The product (${serverToUpdate.title}) is almost out of stock, there is ${serverToUpdate.codes.length} codes available.`, 
+                link:`/servers/${serverToUpdate._id}/edit`
+            })
+        }
+        else if(serverToUpdate.codes.length === 0){
+            await AdminNotification.create({
+                isSeen:false, 
+                content:`The product (${serverToUpdate.title}) is out of stock, there is no code available.`, 
+                link:`/servers/${serverToUpdate._id}/edit`
+            })
+        }
 
         return res.status(200).json({message:"Updated Successfully"})
 
