@@ -31,7 +31,7 @@ const createCode = asyncHandler(async(req, res)=>{
             await AdminNotification.create({
                 productId:newCode._id,
                 isSeen:false, 
-                content:`The product (${newCode.title}) is almost out of stock, there is ${newCode.codes.length} codes available.`, 
+                content:`The product "${newCode.title}" is almost out of stock, there is ${newCode.codes.length} codes available.`, 
                 link:`/codes/${newCode._id}/edit`,
                 type:"stock"
                 
@@ -40,7 +40,7 @@ const createCode = asyncHandler(async(req, res)=>{
         else if(newCode.codes.length === 0){
             await AdminNotification.create({
                 isSeen:false, 
-                content:`The product (${newCode.title}) is out of stock, there is no code available.`, 
+                content:`The product "${newCode.title}" is out of stock, there is no code available.`, 
                 link:`/codes/${newCode._id}/edit`,
                 type:"stock",
                 productId:newCode._id,
@@ -184,21 +184,21 @@ const updateCode = asyncHandler(async(req, res)=>{
         // update link
         await codeToUpdate.save();
 
-        if(codeToUpdate.codes.length <= 3 &&  codeToUpdate.codes.length > 0){
+        if(codeToUpdate.codes?.length <= 3 &&  codeToUpdate.codes?.length > 0){
             await AdminNotification.findOneAndDelete({type:"stock", productId:codeToUpdate._id});
             await AdminNotification.create({
                 isSeen:false, 
-                content:`The product (${codeToUpdate.title}) is almost out of stock, there is ${codeToUpdate.codes.length} codes available.`, 
+                content:`The product "${codeToUpdate.title}" is almost out of stock, there is ${codeToUpdate.codes.length} codes available.`, 
                 link:`/codes/${codeToUpdate._id}/edit`,
                 type:"stock",
                 productId:codeToUpdate._id
             })
         }
-        else if(codeToUpdate.codes.length === 0){
+        else if(!codeToUpdate.codes || codeToUpdate.codes?.length === 0){
             await AdminNotification.findOneAndDelete({type:"stock", productId:codeToUpdate._id});
             await AdminNotification.create({
                 isSeen:false, 
-                content:`The product (${codeToUpdate.title}) is out of stock, there is no code available.`, 
+                content:`The product "${codeToUpdate.title}" is out of stock, there is no code available.`, 
                 link:`/codes/${codeToUpdate._id}/edit`,
                 type:"stock",
                 productId:codeToUpdate._id

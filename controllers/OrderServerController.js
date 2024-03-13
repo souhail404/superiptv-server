@@ -80,27 +80,27 @@ const createOrder = asyncHandler(async (req, res) => {
     await AdminNotification.create({
         isSeen:false, 
         productId:newOrder._id,
-        content:`New server order (${product.title}) by ${user.userName} at ${price} Dhs`, 
-        link:`/orders/servers/${newOrder._id}`,
+        content:`${user.userName} ordered a server "${product.title}" for ${price} Dhs`, 
+        link:`/orders/servers/`,
         type:"order"
     })
 
     if(product.codes.length <= 3 &&  product.codes.length > 0){
         await AdminNotification.findOneAndDelete({type:"stock", productId:product._id});
-        await AdminNotification.create({
+        await AdminNotification.create({ 
             isSeen:false, 
             productId:product._id,
-            content:`The product (${product.title}) is almost out of stock, there is ${product.codes.length} codes available.`, 
+            content:`The product "${product.title}" is almost out of stock, there is ${product.codes.length} codes available.`, 
             link:`/servers/${product._id}/edit`,
             type:"stock"
-        })
+        })  
     }
     else if(product.codes.length === 0){
         await AdminNotification.findOneAndDelete({type:"stock", productId:product._id});
-        await AdminNotification.create({
+        await AdminNotification.create({ 
             isSeen:false, 
             productId:product._id,
-            content:`The product (${product.title}) is out of stock, there is no code available.`, 
+            content:`The product "${product.title}" is out of stock, there is no code available.`, 
             link:`/servers/${product._id}/edit`,
             type:"stock"
         })

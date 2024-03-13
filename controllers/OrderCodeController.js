@@ -83,8 +83,8 @@ const createOrder = asyncHandler(async (req, res) => {
     await AdminNotification.create({
         isSeen:false, 
         productId:newOrder._id,
-        content:`New code order (${product.title}) by ${user.userName} at ${price} Dhs`, 
-        link:`/orders/codes/${newOrder._id}`,
+        content:`${user.userName} ordered a code "${product.title}" for ${price} Dhs`, 
+        link:`/orders/codes/`,
         type:"order"
     })
     
@@ -94,7 +94,7 @@ const createOrder = asyncHandler(async (req, res) => {
         await AdminNotification.create({
             isSeen:false, 
             productId:product._id,
-            content:`The product (${product.title}) is almost out of stock, there is ${product.codes.length} codes available.`, 
+            content:`The product "${product.title}" is almost out of stock, there is ${product.codes.length} codes available.`, 
             link:`/codes/${product._id}/edit`,
             type:"stock"
         })
@@ -104,7 +104,7 @@ const createOrder = asyncHandler(async (req, res) => {
         await AdminNotification.create({
             isSeen:false, 
             productId:product._id,
-            content:`The product (${product.title}) is out of stock, there is no code available.`, 
+            content:`The product "${product.title}" is out of stock, there is no code available.`, 
             link:`/codes/${product._id}/edit`,
             type:"order"
         })

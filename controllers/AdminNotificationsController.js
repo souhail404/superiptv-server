@@ -70,7 +70,40 @@ const getNotifications = asyncHandler(async (req, res) => {
     }
 })
 
+const seeNotification = asyncHandler(async (req, res) => {
+    try {
+        const notifId = req.params.notifId;
+
+        const makeSeen = await AdminNotification.findOneAndUpdate({_id:notifId}, {isSeen:true}, {new:true})
+
+        if (!makeSeen) {
+            return res.status(400).json({ message: 'Error updating the notification state'});
+        }
+        return res.status(200).json({ message: 'Updated successfully'});
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Internal Code error', error});
+    }
+})
+
+const deleteNotification = asyncHandler(async(req, res)=>{
+    try{
+        const notifId = req.params.notifId;
+        
+        // delete 
+        const deleteNotif = await AdminNotification.findOneAndDelete({_id:notifId}); 
+        if(!deleteNotif){
+            return res.status(400).json({message:'error while Deleting Notification'})
+        } 
+        return res.status(200).json({message:'Notificaton deleted successfully', deleteNotif})
+    }
+    catch(error){
+        return res.status(500).json({message:'internal server error', error})
+    }
+});
 
 module.exports = {
-    getNotifications
+    getNotifications,
+    seeNotification,
+    deleteNotification
 }
