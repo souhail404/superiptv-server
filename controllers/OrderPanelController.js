@@ -67,8 +67,10 @@ const createOrder = asyncHandler(async (req, res) => {
 
         await AdminNotification.create({
             isSeen:false, 
+            productId:newOrder._id,
             content:`New panel order (${product.title}) by ${user.userName} at ${price} Dhs`, 
-            link:`/orders/panels/${newOrder._id}`
+            link:`/orders/panels/${newOrder._id}`,
+            type:"order"
         })
 
         return res.status(200).json({message:'order created successfully', order:newOrder});

@@ -29,16 +29,21 @@ const createCode = asyncHandler(async(req, res)=>{
         
         if(newCode.codes.length <= 3 &&  newCode.codes.length > 0){
             await AdminNotification.create({
+                productId:newCode._id,
                 isSeen:false, 
                 content:`The product (${newCode.title}) is almost out of stock, there is ${newCode.codes.length} codes available.`, 
-                link:`/codes/${newCode._id}/edit`
+                link:`/codes/${newCode._id}/edit`,
+                type:"stock"
+                
             })
         }
         else if(newCode.codes.length === 0){
             await AdminNotification.create({
                 isSeen:false, 
                 content:`The product (${newCode.title}) is out of stock, there is no code available.`, 
-                link:`/codes/${newCode._id}/edit`
+                link:`/codes/${newCode._id}/edit`,
+                type:"stock",
+                productId:newCode._id,
             })
         }
 
@@ -180,18 +185,27 @@ const updateCode = asyncHandler(async(req, res)=>{
         await codeToUpdate.save();
 
         if(codeToUpdate.codes.length <= 3 &&  codeToUpdate.codes.length > 0){
+            await AdminNotification.findOneAndDelete({type:"stock", productId:codeToUpdate._id});
             await AdminNotification.create({
                 isSeen:false, 
                 content:`The product (${codeToUpdate.title}) is almost out of stock, there is ${codeToUpdate.codes.length} codes available.`, 
-                link:`/codes/${codeToUpdate._id}/edit`
+                link:`/codes/${codeToUpdate._id}/edit`,
+                type:"stock",
+                productId:codeToUpdate._id
             })
         }
         else if(codeToUpdate.codes.length === 0){
+            await AdminNotification.findOneAndDelete({type:"stock", productId:codeToUpdate._id});
             await AdminNotification.create({
                 isSeen:false, 
                 content:`The product (${codeToUpdate.title}) is out of stock, there is no code available.`, 
-                link:`/codes/${codeToUpdate._id}/edit`
+                link:`/codes/${codeToUpdate._id}/edit`,
+                type:"stock",
+                productId:codeToUpdate._id
             })
+        }
+        else{
+            await AdminNotification.findOneAndDelete({type:"stock", productId:codeToUpdate._id});
         }
 
         return res.status(200).json({message:"Updated Successfully"})

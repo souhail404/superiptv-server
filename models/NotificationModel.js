@@ -13,6 +13,15 @@ var adminNotificationSchema = new mongoose.Schema({
     link:{
         type:String,
     },
+    type:{
+        type:String,
+        enum: ['order', 'stock'],
+        required:true,
+    },
+    productId:{
+        type:String,
+        required:true,
+    }
 },
 {
     timestamps:true,

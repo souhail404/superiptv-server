@@ -29,15 +29,19 @@ const createServer = asyncHandler(async(req, res)=>{
         if(newServer.codes.length <= 3 &&  newServer.codes.length > 0){
             await AdminNotification.create({
                 isSeen:false, 
+                productId:newServer._id,
                 content:`The product (${newServer.title}) is almost out of stock, there is ${newServer.codes.length} codes available.`, 
-                link:`/servers/${newServer._id}/edit`
+                link:`/servers/${newServer._id}/edit`,
+                type:"stock"
             })
         }
         else if(newServer.codes.length === 0){
             await AdminNotification.create({
                 isSeen:false, 
+                productId:newServer._id,
                 content:`The product (${newServer.title}) is out of stock, there is no code available.`, 
-                link:`/servers/${newServer._id}/edit`
+                link:`/servers/${newServer._id}/edit`,
+                type:"stock"
             })
         }
 
@@ -177,18 +181,27 @@ const updateServer = asyncHandler(async(req, res)=>{
         await serverToUpdate.save();
 
         if(serverToUpdate.codes.length <= 3 &&  serverToUpdate.codes.length > 0){
+            await AdminNotification.findOneAndDelete({type:"stock", productId:serverToUpdate._id});
             await AdminNotification.create({
                 isSeen:false, 
+                productId:serverToUpdate._id,
                 content:`The product (${serverToUpdate.title}) is almost out of stock, there is ${serverToUpdate.codes.length} codes available.`, 
-                link:`/servers/${serverToUpdate._id}/edit`
+                link:`/servers/${serverToUpdate._id}/edit`,
+                type:"stock"
             })
         }
         else if(serverToUpdate.codes.length === 0){
+            await AdminNotification.findOneAndDelete({type:"stock", productId:serverToUpdate._id});
             await AdminNotification.create({
                 isSeen:false, 
+                productId:serverToUpdate._id,
                 content:`The product (${serverToUpdate.title}) is out of stock, there is no code available.`, 
-                link:`/servers/${serverToUpdate._id}/edit`
+                link:`/servers/${serverToUpdate._id}/edit`,
+                type:"stock"
             })
+        }
+        else{
+            await AdminNotification.findOneAndDelete({type:"stock", productId:serverToUpdate._id});
         }
 
         return res.status(200).json({message:"Updated Successfully"})

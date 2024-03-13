@@ -77,26 +77,34 @@ const createOrder = asyncHandler(async (req, res) => {
     product.orders.push(newOrder._id)
     await product.save();
 
+    await AdminNotification.create({
+        isSeen:false, 
+        productId:newOrder._id,
+        content:`New server order (${product.title}) by ${user.userName} at ${price} Dhs`, 
+        link:`/orders/servers/${newOrder._id}`,
+        type:"order"
+    })
+
     if(product.codes.length <= 3 &&  product.codes.length > 0){
+        await AdminNotification.findOneAndDelete({type:"stock", productId:product._id});
         await AdminNotification.create({
             isSeen:false, 
+            productId:product._id,
             content:`The product (${product.title}) is almost out of stock, there is ${product.codes.length} codes available.`, 
-            link:`/servers/${product._id}/edit`
+            link:`/servers/${product._id}/edit`,
+            type:"stock"
         })
     }
     else if(product.codes.length === 0){
+        await AdminNotification.findOneAndDelete({type:"stock", productId:product._id});
         await AdminNotification.create({
             isSeen:false, 
+            productId:product._id,
             content:`The product (${product.title}) is out of stock, there is no code available.`, 
-            link:`/servers/${product._id}/edit`
+            link:`/servers/${product._id}/edit`,
+            type:"stock"
         })
     }
-
-    await AdminNotification.create({
-        isSeen:false, 
-        content:`New server order (${product.title}) by ${user.userName} at ${price} Dhs`, 
-        link:`/orders/servers/${newOrder._id}`
-    })
 
     return res.status(200).json({message:'order created successfully', order:newOrder});
   } catch (error) {
@@ -193,6 +201,7 @@ const seeOrder = asyncHandler(async (req, res) => {
     try {
         const orderId = req.params.orderId;
 
+        console.log(orderId);
         const makeSeen = await OrderServerModel.findOneAndUpdate({_id:orderId}, {isSeen:true}, {new:true})
 
         if (!makeSeen) {
