@@ -231,9 +231,27 @@ const validOrder = asyncHandler(async (req, res) => {
     }
 })
 
+const editCode = asyncHandler(async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const code = req.body.code;
+
+        const updatedOrder = await OrderServerModel.findOneAndUpdate({_id:orderId}, {code:code}, {new:true})
+
+        if (!updatedOrder) {
+            return res.status(400).json({ message: 'Error updating the order'});
+        }
+        return res.status(200).json({ message: 'Updated successfully'});
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Internal Code error', error});
+    }
+})
+
 module.exports = {
     createOrder,
     getOrders,
     seeOrder,
-    validOrder
+    validOrder,
+    editCode
 }

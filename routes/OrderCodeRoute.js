@@ -2,7 +2,8 @@ const {
     createOrder,
     getOrders,
     seeOrder,
-    validOrder
+    validOrder,
+    editCode
 } = require('../controllers/OrderCodeController');
 
 const express = require('express');
@@ -21,5 +22,7 @@ router.put('/seen/:orderId', authMiddleware, isAdmin, seeOrder);
 // ORDER VALIDATION UPDATE -ROUTE 
 router.put('/valid/:orderId', authMiddleware, isAdmin, validOrder);
 
+// ORDER CODE UPDATE -ROUTE 
+router.put('/code/:orderId', authMiddleware, isAdmin, editCode);
 
 module.exports = router;
